@@ -4,4 +4,6 @@ This is a WebProtégé microservice that is responsible for generating an intial
 
 ## Status
 
-[![Java CI](https://github.com/protegeproject/webprotege-initial-revision-history-service/actions/workflows/ci.yaml/badge.svg)](https://github.com/protegeproject/webprotege-initial-revision-history-service/actions/workflows/ci.yaml)
+[![Java Continous Integration](https://github.com/protegeproject/webprotege-initial-revision-history-service/actions/workflows/ci.yaml/badge.svg)](https://github.com/protegeproject/webprotege-initial-revision-history-service/actions/workflows/ci.yaml)
+
+[![Publish to Docker Hub](https://github.com/protegeproject/webprotege-initial-revision-history-service/actions/workflows/pub-docker-hub.yaml/badge.svg)](https://github.com/protegeproject/webprotege-initial-revision-history-service/actions/workflows/pub-docker-hub.yaml)
