@@ -42,7 +42,7 @@ jobs:
       - name: Build package
         run: mvn --batch-mode clean package
       - name: Build and push image
-        run: mvn --batch-mode -pl webprotege-gwt-ui-server -am package install
+        run: mvn --batch-mode -pl webprotege-initial-revision-history-service -am package install
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
@@ -65,8 +65,8 @@ jobs:
       service: ${{ needs.build.outputs.service }}
       branch_var: ${{vars.BUMP_WEBPROTEGE_BRANCH}}
     secrets:
-      PROTEGE_PROJECT_CLIENT_ID: ${{ secrets.PROTEGE_PROJECT_CLIENT_ID }}
-      PROTEGE_PROJECT_CLIENT_SECRET: ${{ secrets.PROTEGE_PROJECT_CLIENT_SECRET }}
+      PROTEGE_PROJECT_CLIENT_ID: ${{ secrets.PROTEGEPROJECT_BOT_APP_TOKEN }}
+      PROTEGE_PROJECT_CLIENT_SECRET: ${{ secrets.PROTEGEPROJECT_BOT_APP_PRIVATE_KEY }}
 
 env:
   DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
