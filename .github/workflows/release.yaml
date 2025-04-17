@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - main-who
+      - master-who
 
 jobs:
   build:
@@ -36,25 +36,55 @@ jobs:
           server-id: docker.io
           server-username: DOCKER_USERNAME
           server-password: DOCKER_PASSWORD
+      - name: Get current version
+        id: get-version
+        run: |
+          current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Current version: $current_version"
+          echo "::set-output name=current_version::$current_version"
       - name: Bump version
         id: bump
-        uses: mickem/gh-action-bump-maven-version@v1
+        run: |
+          current_version=${{ steps.get-version.outputs.current_version }}
+          branch=${GITHUB_REF##*/}
+          echo "Current branch: $branch"
+          
+          # Extract the base version without suffix
+          base_version=$(echo $current_version | sed -E 's/(-.*)?$//')
+          
+          # Increment the base version (assuming semantic versioning)
+          IFS='.' read -r -a version_parts <<< "$base_version"
+          version_parts[2]=$((version_parts[2] + 1))
+          new_base_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}-WHO"
+          
+          echo "New version: $new_base_version"
+          find . -name 'pom.xml' -exec mvn versions:set -DnewVersion=$new_base_version -DgenerateBackupPoms=false -f {} \;
+          echo "::set-output name=new_base_version::$new_base_version"
+      - name: Commit new version
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Bump version to ${{ steps.bump.outputs.new_base_version }}"
+          git tag ${{ steps.bump.outputs.new_base_version }}
+          git push origin HEAD:${GITHUB_REF##*/}
+          git push origin ${{ steps.bump.outputs.new_base_version }}
       - name: Build package
         run: mvn --batch-mode clean package
       - name: Build and push image
-        run: mvn -am package install
+        run: mvn --batch-mode package install
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.bump.outputs.tag }}
+          tag_name: ${{ steps.bump.outputs.new_base_version }}
           generate_release_notes: true
 
       - name: Set outputs
         id: release-outputs
         run: |
-          echo "version=${{ steps.bump.outputs.tag }}" >> $GITHUB_OUTPUT
+          echo "version=${{ steps.bump.outputs.new_base_version }}" >> $GITHUB_OUTPUT
           echo "service=webprotege-initial-revision-history-service" >> $GITHUB_OUTPUT
 
   notify-bump:
