@@ -42,7 +42,7 @@ jobs:
       - name: Build package
         run: mvn --batch-mode clean package
       - name: Build and push image
-        run: mvn --batch-mode -pl webprotege-initial-revision-history-service -am package install
+        run: mvn -am package install
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
@@ -55,7 +55,7 @@ jobs:
         id: release-outputs
         run: |
           echo "version=${{ steps.bump.outputs.tag }}" >> $GITHUB_OUTPUT
-          echo "service=>webprotege-initial-revision-history-service" >> $GITHUB_OUTPUT
+          echo "service=webprotege-initial-revision-history-service" >> $GITHUB_OUTPUT
 
   notify-bump:
     needs: build
