@@ -10,7 +10,7 @@
     </parent>
     <groupId>edu.stanford.protege</groupId>
     <artifactId>webprotege-initial-revision-history-service</artifactId>
-    <version>1.0.7-WHO</version>
+    <version>1.0.8-WHO</version>
     <name>webprotege-initial-revision-history-service</name>
     <description>This service reads Binary OWL ontology documents from cloud storage (using MinIO) and, from these, generates WebProtégé
         revision history document that contains a single revision to create these ontologies.</description>
