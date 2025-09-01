@@ -35,18 +35,24 @@ public class InitialRevisionGenerator {
     public BlobLocation writeRevisionHistoryFromOntologies(UserId userId,
                                                            List<BlobLocation> ontologyDocumentLocations,
                                                            String initialChangeDescription) {
-        logger.info("Creating initial revision history document from ontologies");
-        var ontologyChanges = new ArrayList<OntologyChange>();
-        ontologyDocumentLocations.forEach(ontologyDocumentLocation -> {
-            ontologyChangesLoader.loadOntologyAndPopulateChanges(ontologyDocumentLocation, userId, ontologyChanges);
-            logger.info("Processed ontology at {}.  Cumulative number of changes: {}", ontologyDocumentLocation, ontologyChanges.size());
-        });
-        var initialRevisionNumber = RevisionNumber.getRevisionNumber(1);
-        var timestamp = System.currentTimeMillis();
-        var initialRevision = new Revision(userId, initialRevisionNumber, ImmutableList.copyOf(ontologyChanges), timestamp, initialChangeDescription);
-        var revisionLocation = revisionHistoryStorer.storeRevision(initialRevision);
-        logger.info("Stored revision history document at {}", revisionLocation);
-        return revisionLocation;
+        try {
+            logger.info("Creating initial revision history document from ontologies");
+            var ontologyChanges = new ArrayList<OntologyChange>();
+            ontologyDocumentLocations.forEach(ontologyDocumentLocation -> {
+                ontologyChangesLoader.loadOntologyAndPopulateChanges(ontologyDocumentLocation, userId, ontologyChanges);
+                logger.info("Processed ontology at {}.  Cumulative number of changes: {}", ontologyDocumentLocation, ontologyChanges.size());
+            });
+            var initialRevisionNumber = RevisionNumber.getRevisionNumber(1);
+            var timestamp = System.currentTimeMillis();
+            var initialRevision = new Revision(userId, initialRevisionNumber, ImmutableList.copyOf(ontologyChanges), timestamp, initialChangeDescription);
+            var revisionLocation = revisionHistoryStorer.storeRevision(initialRevision);
+            logger.info("Stored revision history document at {}", revisionLocation);
+            return revisionLocation;
+        } catch (Exception e) {
+            logger.error("Error while writing revision from ontology", e);
+            throw new RuntimeException("Error while writing revision from ontology", e);
+        }
+
     }
 
 
